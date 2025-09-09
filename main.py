@@ -1,20 +1,11 @@
-from CRUD.Add import AddClass,AddSubject,AddStudent,AddTeacher,AddGrade,AddClassTeacher
-from dbcreate.engcreate import createDb
+from CRUD.Add import AddClass, AddSubject, AddStudent, AddTeacher, AddGrade, AddClassTeacher
+from dbcreate.engcreate import createDB
 
-
-
-
-
-
-
-createDb()   
-
-       
+createDB()   
+ 
 AddClass()          
 AddSubject()         
 AddStudent()   
 AddTeacher() 
 AddGrade()        
-AddClassTeacher()      
-
-        
+AddClassTeacher()

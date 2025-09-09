@@ -4,7 +4,7 @@ class Student(SQLModel, table=True):
         name: str   
         phone_num: str   
         age: int 
-        class_id: int = Field(foreign_key="class.id")  
+        class_id: int = Field(foreign_key="class.id")   #class.id means the class named Class but SQLModel uses lowercase table's name.
 
 
 class Teacher(SQLModel, table=True):

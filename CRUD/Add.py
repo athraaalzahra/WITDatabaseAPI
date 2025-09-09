@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from dbcreate.model import Student,Teacher,Class,Grade,Subject,ClassTeacher
+from dbcreate.model import Student, Teacher, Class, Grade, Subject, ClassTeacher
 from dbcreate.engcreate import engine
 
 
@@ -38,7 +38,7 @@ def AddStudent():
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"✅ Student Added: {obj}")
+        print(f"Student Added: {obj}")
 
 
 def AddTeacher():
@@ -52,7 +52,7 @@ def AddTeacher():
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"✅ Teacher Added: {obj}")
+        print(f"Teacher Added: {obj}")
 
 
 def AddClass():
@@ -63,7 +63,7 @@ def AddClass():
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"✅ Class Added: {obj}")
+        print(f"Class Added: {obj}")
 
 
 def AddSubject():
@@ -74,7 +74,7 @@ def AddSubject():
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"✅ Subject Added: {obj}")
+        print(f"Subject Added: {obj}")
 
 
 def AddGrade():
@@ -87,7 +87,7 @@ def AddGrade():
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"✅ Grade Added: {obj}")
+        print(f"Grade Added: {obj}")
 
 
 def AddClassTeacher():
@@ -99,4 +99,4 @@ def AddClassTeacher():
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"✅ ClassTeacher Added: {obj}")
+        print(f"ClassTeacher Added: {obj}")
