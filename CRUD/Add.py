@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from dbcreate.model import Student, Teacher, Class, Grade, Subject, ClassTeacher
+from dbcreate.model import *
 from dbcreate.engcreate import engine
 
 

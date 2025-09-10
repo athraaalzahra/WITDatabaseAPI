@@ -1,7 +1,7 @@
-from CRUD.Add import AddClass, AddSubject, AddStudent, AddTeacher, AddGrade, AddClassTeacher
+from CRUD.Add import *
 # from dbcreate.engcreate import createDB
-from CRUD.Update import UpdateStudent, UpdateTeacher, UpdateSubject, UpdateClass, UpdateClassTeacher, UpdateGrade
-from CRUD.Delete import deleteStudent
+from CRUD.Update import *
+from CRUD.Delete import *
 # createDB()
  
 # AddClass()          

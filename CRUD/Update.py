@@ -1,5 +1,5 @@
 from sqlmodel import Session
-from dbcreate.model import Student, Teacher, Class, Subject, Grade, ClassTeacher
+from dbcreate.model import *
 from dbcreate.engcreate import engine
 
 def get_string(prompt: str) -> str:

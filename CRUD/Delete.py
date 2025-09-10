@@ -1,5 +1,5 @@
 from sqlmodel import Session
-from dbcreate.model import Student, Teacher, Class, Subject, Grade, ClassTeacher
+from dbcreate.model import *
 from dbcreate.engcreate import engine
 
 
@@ -26,8 +26,8 @@ def get_int(prompt: str) -> int:
     
 def deleteStudent():
     with Session(engine) as session:
-        StudentName = get_string("Enter the student's name to delete: ")
-        student = session.get(Student, StudentName)
+        StudentID = get_int("Enter the student's ID to delete: ")
+        student = session.get(Student, StudentID)
         print(student)
 
         if not student:
