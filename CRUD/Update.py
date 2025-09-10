@@ -46,7 +46,8 @@ def UpdateStudent():
                 case "p":
                     newPhone = get_digits("Enter new phone number: ")
                 case "x":
-                    break
+                    print("There was no update")
+                    return
                 case _:
                     print("Invalid option!")
 
@@ -78,7 +79,7 @@ def UpdateTeacher():
                 case "s":
                     newSalary = get_string("Enter new salary: ")
                 case "x":
-                    break
+                    print
                 case _:
                     print("Invalid option!")
 

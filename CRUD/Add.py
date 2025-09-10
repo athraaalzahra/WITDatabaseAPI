@@ -34,7 +34,7 @@ def AddStudent():
     class_id = get_int("Enter Student Class ID: ")
 
     with Session(engine) as session:
-        obj = Student(name=name, phone_num=phone_num, age=age, Class_id=class_id)
+        obj = Student(name=name, phone_num=phone_num, age=age, class_id=class_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
@@ -48,7 +48,7 @@ def AddTeacher():
     subject_id = get_int("Enter Teacher Subject ID: ")
 
     with Session(engine) as session:
-        obj = Teacher(name=name, age=age, salary=salary, Subject_id=subject_id)
+        obj = Teacher(name=name, age=age, salary=salary, subject_id=subject_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
@@ -83,7 +83,7 @@ def AddGrade():
     subject_id = get_int("Enter Subject ID: ")
 
     with Session(engine) as session:
-        obj = Grade(grade=grade, Student_id=student_id, Subject_id=subject_id)
+        obj = Grade(grade=grade, Student_id=student_id, subject_id=subject_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
@@ -95,7 +95,7 @@ def AddClassTeacher():
     class_id = get_int("Enter Class ID: ")
 
     with Session(engine) as session:
-        obj = ClassTeacher(Teacher_id=teacher_id, Class_id=class_id)
+        obj = ClassTeacher(Teacher_id=teacher_id, class_id=class_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
