@@ -1,9 +1,6 @@
 from sqlmodel import Session, select
-<<<<<<< HEAD
 from dbcreate.model import *
-=======
 from dbcreate.model import Student, Teacher, Class, Grade, Subject, ClassTeacher
->>>>>>> dfda6a2f97dbcf109d92dc486fc41a45edf6fb33
 from dbcreate.engcreate import engine
 import json
 
