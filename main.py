@@ -7,15 +7,15 @@ def main():
     #createDB()
     print("The Database Has Been Created")
 while True:
-    print("Chose What CRUD Method You Want To Do")
+    print("Chose What CRUD Method You Want To Do: ")
     print("(A) for Add")
     print("(G) for get")
     print("(U) for updata")
     print("(D) for delete")
     print("(E) for exit ")
-    CRUD=input("Enter Your CRUD Method").title().strip()
+    CRUD=input("Enter Your CRUD Method: ").title().strip()
     if CRUD == "A":
-        print("\n--- ADD Menu ---")
+        print("ADD Menu ")
         print("1. Add Class")
         print("2. Add Subject")
         print("3. Add Student")
@@ -23,14 +23,16 @@ while True:
         print("5. Add Grade")
         print("6. Add ClassTeacher")
         CRUDchoice = input("Enter CRUDchoice: ").strip()
-    if CRUDchoice=="1":AddClass()
-    elif CRUDchoice=="2":AddSubject()
-    elif CRUDchoice=="3":AddStudent()
-    elif CRUDchoice=="4":AddTeacher()
-    elif CRUDchoice=="5":AddGrade()
-    elif CRUDchoice=="6":AddClassTeacher()
+        if CRUDchoice=="1":AddClass()
+        elif CRUDchoice=="2":AddSubject()
+        elif CRUDchoice=="3":AddStudent()
+        elif CRUDchoice=="4":AddTeacher()
+        elif CRUDchoice=="5":AddGrade()
+        elif CRUDchoice=="6":AddClassTeacher()
+        else: 
+            exit("GOODBYE!")
     elif CRUD == "G":
-        print("\n--- GET Menu ---")
+        print("GET Menu: ")
         print("1. Get Student by ID")
         print("2. Get All Students")
         print("3. Get Teacher by ID")
@@ -41,7 +43,7 @@ while True:
         print("8. Get All Subjects")
         print("9. Get Grades by Student")
         print("10. Get Teachers by Class")
-        CRUDchoice = input("Enter choice: ").strip()
+        CRUDchoice = input("Enter CRUDchoice: ").strip()
 
         if CRUDchoice == "1": get_student_by_id(int(input("Enter student ID: ")))
         elif CRUDchoice == "2": get_all_students()
@@ -53,16 +55,50 @@ while True:
         elif CRUDchoice == "8": get_all_subjects()
         elif CRUDchoice == "9": get_grades_by_student(int(input("Enter student ID: ")))
         elif CRUDchoice == "10": get_teachers_by_class(int(input("Enter class ID: ")))
+        else: 
+            exit("GOODBYE!")
+    elif CRUD == "U":
+        print("UPDATE Menu ")
+        print("1. Update Class")
+        print("2. Update Subject")
+        print("3. Update Student")
+        print("4. Update Teacher")
+        print("5. Update Grade")
+        print("6. Update class teacher")
+        CRUDchoice = input("Enter CRUDchoice: ").strip()
+
+        if CRUDchoice == "1": UpdateClass()
+        elif CRUDchoice == "2": UpdateSubject()
+        elif CRUDchoice == "3": UpdateStudent()
+        elif CRUDchoice == "4": UpdateTeacher()
+        elif CRUDchoice == "5": UpdateGrade()
+        elif CRUDchoice =="6":UpdateClassTeacher()
+        else: 
+            exit("GOODBYE!")
+    elif CRUD == "D":
+        print("\n--- DELETE Menu ---")
+        print("1. Delete Class")
+        print("2. Delete Subject")
+        print("3. Delete Student")
+        print("4. Delete Teacher")
+        print("5. Delete Grade")
+        print("6. Delete class teacher")
+        CRUDchoice = input("Enter CRUDchoice: ").strip()
+
+        if CRUDchoice == "1": deleteClass()
+        elif CRUDchoice == "2": deleteSubject()
+        elif CRUDchoice == "3": deleteStudent()
+        elif CRUDchoice == "4": deleteTeacher()
+        elif CRUDchoice == "5": deleteGrade()
+        elif CRUDchoice =="6": deleteClassTeacher()
+        else: 
+            exit("GOODBYE!")
+    elif CRUD =="E":
+        exit("!!!!!!!!GOODBYE!!!!!!!!!")
+    else:
+        print("please enter valid input :( ")
+
+
+
+
         
-# createDB()
- 
-# AddClass()          
-# AddSubject()         
-# AddStudent()
-# AddTeacher() 
-# AddGrade()        
-# AddClassTeacher()
-# UpdateGrade()
-# UpdateStudent()
-# deleteStudent()
-deleteSubject()

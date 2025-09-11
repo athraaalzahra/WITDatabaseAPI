@@ -23,7 +23,16 @@ def get_int(prompt: str) -> int:
     except ValueError:
         print("Invalid input! Please enter an integer.")
         return get_int(prompt)
-
+    
+def sureDelete():
+    while True:
+            areSure = input("Are you sure you? (Y for Yes, N for No) ").lower().strip()
+            if(areSure == 'y'):
+                return True
+            elif(areSure == 'n'):
+                return False
+            else:
+                print("Please enter a valid option!")
 
 def deleteStudent():
     with Session(engine) as session:
@@ -32,9 +41,10 @@ def deleteStudent():
         if not student:
             print("Student not found!")
             return
-        session.delete(student)
-        session.commit()
-        print("Student deleted successfully.")
+        if(sureDelete()):
+            session.delete(student)
+            session.commit()
+            print("Student deleted successfully.")
 
 def deleteTeacher():
     with Session(engine) as session:
@@ -43,9 +53,10 @@ def deleteTeacher():
         if not teacher:
             print("Teacher not found!")
             return
-        session.delete(teacher)
-        session.commit()
-        print("Teacher deleted successfully.")
+        if(sureDelete()):
+            session.delete(teacher)
+            session.commit()
+            print("Teacher deleted successfully.")
 
 def deleteClass():
     with Session(engine) as session:
@@ -54,9 +65,10 @@ def deleteClass():
         if not cls:
             print("Class not found!")
             return
-        session.delete(cls)
-        session.commit()
-        print("Class deleted successfully.")
+        if(sureDelete()):
+            session.delete(cls)
+            session.commit()
+            print("Class deleted successfully.")
 
 def deleteSubject():
     with Session(engine) as session:
@@ -65,9 +77,10 @@ def deleteSubject():
         if not subject:
             print("Subject not found!")
             return
-        session.delete(subject)
-        session.commit()
-        print("Subject deleted successfully.")
+        if(sureDelete()):
+            session.delete(subject)
+            session.commit()
+            print("Subject deleted successfully.")
 
 def deleteGrade():
     with Session(engine) as session:
@@ -76,9 +89,10 @@ def deleteGrade():
         if not grade:
             print("Grade not found!")
             return
-        session.delete(grade)
-        session.commit()
-        print("Grade deleted successfully.")
+        if(sureDelete()):
+            session.delete(grade)
+            session.commit()
+            print("Grade deleted successfully.")
 
 def deleteClassTeacher():
     with Session(engine) as session:
@@ -87,6 +101,7 @@ def deleteClassTeacher():
         if not ct:
             print("ClassTeacher record not found!")
             return
-        session.delete(ct)
-        session.commit()
-        print("ClassTeacher deleted successfully.")
+        if(sureDelete()):
+            session.delete(ct)
+            session.commit()
+            print("ClassTeacher deleted successfully.")
