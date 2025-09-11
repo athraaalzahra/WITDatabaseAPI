@@ -6,10 +6,11 @@ from CRUD.Delete import *
  
 # AddClass()          
 # AddSubject()         
-# AddStudent()   
+# AddStudent()
 # AddTeacher() 
 # AddGrade()        
 # AddClassTeacher()
 # UpdateGrade()
 # UpdateStudent()
-deleteStudent()
+# deleteStudent()
+deleteSubject()
