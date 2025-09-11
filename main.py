@@ -2,7 +2,6 @@ from CRUD.Add import *
 # from dbcreate.engcreate import createDB
 from CRUD.Update import *
 from CRUD.Delete import *
-<<<<<<< HEAD
 from CRUD.Get import *
 def main():
     #createDB()
@@ -55,7 +54,6 @@ while True:
         elif CRUDchoice == "9": get_grades_by_student(int(input("Enter student ID: ")))
         elif CRUDchoice == "10": get_teachers_by_class(int(input("Enter class ID: ")))
         
-=======
 # createDB()
  
 # AddClass()          
@@ -68,4 +66,3 @@ while True:
 # UpdateStudent()
 # deleteStudent()
 deleteSubject()
->>>>>>> dfda6a2f97dbcf109d92dc486fc41a45edf6fb33
