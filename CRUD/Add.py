@@ -76,6 +76,7 @@ def AddGrade():
         )
         session.add(new_grade)
         session.commit()
+        session.refresh(new_grade)
         print("Grade added successfully.")
 
 

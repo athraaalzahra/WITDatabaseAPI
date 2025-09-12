@@ -5,8 +5,7 @@ from CRUD.Get import *
 from common.shared import get_int
 
 def main():
-
-    while True: 
+    while True:
         print("\nChoose CRUD method:")
         print("(A) Add")
         print("(G) Get")
@@ -17,7 +16,8 @@ def main():
         CRUD = input("Enter your choice: ").upper().strip()
 
         if CRUD == "A":     #Add
-            while True:
+            while True: 
+                print("\nADD Menu")
                 print("1. Add Class")
                 print("2. Add Subject")
                 print("3. Add Student")
@@ -100,7 +100,7 @@ def main():
                 else: print("Invalid choice for Update — please enter 1–7.")
 
         elif CRUD == "D":   #Delete
-            while True:  
+            while True: 
                 print("\nDELETE Menu")
                 print("1. Delete Class")
                 print("2. Delete Subject")
@@ -120,11 +120,11 @@ def main():
                 elif CRUDchoice == "7": break
                 else: print("Invalid choice for Delete — please enter 1–7.")
 
-       
+        
         elif CRUD == "E":   #Exit
             exit("!!!!!!!!GOODBYE!!!!!!!!!")
 
-        else: 
+        else:
             print("Invalid input — please choose A, G, U, D, or E.")
 
 if __name__ == "__main__":
