@@ -1,7 +1,16 @@
 from sqlmodel import SQLModel, Field
+
+
+class Admin(SQLModel, table=True):
+        id: int = Field(primary_key=True, default=None)
+        name: str
+        password: str
+
+
 class Student(SQLModel, table=True):  
-        id: int = Field(primary_key=True, default=None)  
-        name: str   
+        id: int = Field(primary_key=True, default=None)
+        name: str
+        password: str
         phone_num: str   
         age: int 
         class_id: int = Field(foreign_key="class.id")   #class.id means the class named Class but SQLModel uses lowercase table's name.
@@ -10,6 +19,7 @@ class Student(SQLModel, table=True):
 class Teacher(SQLModel, table=True):
         id: int = Field(primary_key=True, default=None)
         name: str
+        password: str
         age: int
         salary: str
         subject_id: int = Field(foreign_key="subject.id") 
@@ -39,4 +49,3 @@ class ClassTeacher(SQLModel, table=True):
         id: int = Field(primary_key=True, default=None)
         teacher_id: int = Field(foreign_key="teacher.id")   # which teacher
         class_id: int = Field(foreign_key="class.id")       # which class
-        

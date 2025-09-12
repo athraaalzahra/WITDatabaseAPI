@@ -14,6 +14,20 @@ def sureDelete():
             else:
                 print("Please enter a valid option!")
 
+
+def deleteAdmin():
+    with Session(engine) as session:
+        adminID = get_int("Enter the admin's ID to delete: ")
+        admin = session.get(Admin, adminID)
+        if not admin:
+            print("Admin not found!")
+            return
+        if(sureDelete()):
+            session.delete(admin)
+            session.commit()
+            print("Admin deleted successfully.")
+
+
 def deleteStudent():
     with Session(engine) as session:
         studentID = get_int("Enter the student's ID to delete: ")

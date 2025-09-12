@@ -2,44 +2,60 @@ from sqlmodel import Session
 from dbcreate.model import *
 from dbcreate.engcreate import engine
 from common.shared import get_string, get_digits, get_int
-    
+import bcrypt
+
+
+def AddAdmin():
+    name = get_string("Enter Admin Name: ")
+    password = input("Enter Admin Password: ")
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())    #Encrypt the password before storing it.
+    with Session(engine) as session:
+        obj = Admin(name=name, password=hashed)
+        session.add(obj)
+        session.commit()
+        session.refresh(obj)
+        print(f"Admin Added: {obj.name}")
+
 def AddStudent():
     name = get_string("Enter Student Name: ")
+    password = input("Enter Student Password: ")
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     phone_num = get_digits("Enter Phone Number: ")
     age = get_int("Enter Student Age: ")
     class_id = get_int("Enter Student Class ID: ")
 
     with Session(engine) as session:
-        obj = Student(name=name, phone_num=phone_num, age=age, class_id=class_id)
+        obj = Student(name=name, password=hashed, phone_num=phone_num, age=age, class_id=class_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"Student Added: {obj}")
+        print(f"Student Added successfully")
 
 
 def AddTeacher():
     name = get_string("Enter Teacher Name: ")
+    password = input("Enter Teacher Password: ")
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     age = get_int("Enter Teacher Age: ")
     salary = get_digits("Enter Teacher Salary: ")
     subject_id = get_int("Enter Teacher Subject ID: ")
 
     with Session(engine) as session:
-        obj = Teacher(name=name, age=age, salary=salary, subject_id=subject_id)
+        obj = Teacher(name=name, password=hashed, age=age, salary=salary, subject_id=subject_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"Teacher Added: {obj}")
+        print(f"Teacher Added successfully.")
 
 
 def AddClass():
     name = get_string("Enter Class Name: ")
-
     with Session(engine) as session:
         obj = Class(name=name)
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"Class Added: {obj}")
+        print(f"Class Added successfully")
 
 
 def AddSubject():
@@ -50,7 +66,7 @@ def AddSubject():
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"Subject Added: {obj}")
+        print(f"Subject Added successfully")
 
 
 def AddGrade():
@@ -100,4 +116,4 @@ def AddClassTeacher():
         session.add(obj)
         session.commit()
         session.refresh(obj)
-        print(f"ClassTeacher Added: {obj}")
+        print(f"ClassTeacher Added successfully")
