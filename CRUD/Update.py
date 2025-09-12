@@ -1,27 +1,8 @@
 from sqlmodel import Session
 from dbcreate.model import *
 from dbcreate.engcreate import engine
+from common.shared import get_string, get_digits, get_int
 
-def get_string(prompt: str) -> str:
-    value = input(prompt).strip().title()
-    if value.isdigit():
-        print("Invalid input! Please enter text only.")
-        return get_string(prompt)
-    return value
-
-def get_digits(prompt: str) -> str:
-    value = input(prompt).strip()
-    if not value.isdigit():
-        print("Invalid input! Please enter digits only.")
-        return get_digits(prompt)
-    return value
-
-def get_int(prompt: str) -> int:
-    try:
-        return int(input(prompt).strip())
-    except ValueError:
-        print("Invalid input! Please enter an integer.")
-        return get_int(prompt)
 
 def UpdateStudent():
     with Session(engine) as session:

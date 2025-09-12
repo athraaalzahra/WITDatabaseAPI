@@ -1,8 +1,8 @@
 from sqlmodel import Session, select
 from dbcreate.model import *
-from dbcreate.model import Student, Teacher, Class, Grade, Subject, ClassTeacher
+from dbcreate.model import *
 from dbcreate.engcreate import engine
-import json
+
 
 def get_student_by_id(student_id: int):
     with Session(engine) as session:
