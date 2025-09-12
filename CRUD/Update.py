@@ -35,7 +35,6 @@ def UpdateStudent():
         print(f"Current info:\nName: {student.name}\nAge: {student.age}\nPhone: {student.phone_num}")
 
         newName, newAge, newPhone = student.name, student.age, student.phone_num
-
         while True:
             whichParam = input("Update Name (N), Age (A), Phone (P), Exit (X): ").lower()
             match whichParam:
@@ -46,7 +45,6 @@ def UpdateStudent():
                 case "p":
                     newPhone = get_digits("Enter new phone number: ")
                 case "x":
-                    print("There was no update")
                     return
                 case _:
                     print("Invalid option!")

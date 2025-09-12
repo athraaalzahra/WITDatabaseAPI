@@ -78,16 +78,31 @@ def AddSubject():
 
 
 def AddGrade():
-    grade = get_int("Enter Grade: ")
-    student_id = get_int("Enter Student ID: ")
-    subject_id = get_int("Enter Subject ID: ")
-
     with Session(engine) as session:
-        obj = Grade(grade=grade, Student_id=student_id, subject_id=subject_id)
-        session.add(obj)
+        grade_value = get_int("Enter the grade: ")
+        student_id = get_int("Enter the student ID: ")
+        subject_id = get_int("Enter the subject ID: ")
+
+        student = session.get(Student, student_id)
+        subject = session.get(Subject, subject_id)
+
+        if not student:
+            print("Student not found!")
+            return
+        if not subject:
+            print("Subject not found!")
+            return
+
+        new_grade = Grade(
+            grade=grade_value,
+            student_id=student_id,
+            subject_id=subject_id
+        )
+        session.add(new_grade)
         session.commit()
-        session.refresh(obj)
-        print(f"Grade Added: {obj}")
+        session.refresh(new_grade)
+        print("Grade added successfully.")
+
 
 
 def AddClassTeacher():
@@ -95,7 +110,17 @@ def AddClassTeacher():
     class_id = get_int("Enter Class ID: ")
 
     with Session(engine) as session:
-        obj = ClassTeacher(Teacher_id=teacher_id, class_id=class_id)
+        teacher = session.get(Teacher, teacher_id)
+        class_ = session.get(Class, class_id)
+
+        if not teacher:
+            print("Teacher not found!")
+            return
+        if not class_:
+            print("Class not found!")
+            return
+
+        obj = ClassTeacher(teacher_id=teacher_id, class_id=class_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
