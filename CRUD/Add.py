@@ -4,6 +4,46 @@ from dbcreate.engcreate import engine
 from dbcreate.model import *
 import bcrypt
 from access.dependencies import get_user_role
+import re, unicodedata
+
+
+E164_RE = re.compile(r'^\+[1-9]\d{7,14}$')  # + then 8–15 digits total
+
+def _to_ascii_digits(s: str) -> str:
+    # Convert any Unicode digit (e.g., Arabic-Indic) to ASCII 0-9
+    out = []
+    for ch in s:
+        try:
+            out.append(str(unicodedata.digit(ch)))
+        except (TypeError, ValueError):
+            out.append(ch)
+    return ''.join(out)
+
+def normalize_phone_no_lib(raw: str, default_cc: str = "+964") -> str:
+    s = _to_ascii_digits(str(raw)).strip()
+
+    # Remove common separators/spaces
+    s = re.sub(r"[ \-().]", "", s)
+
+    # Convert leading 00 to +
+    if s.startswith("00"):
+        s = "+" + s[2:]
+
+    if s.startswith("+"):
+        normalized = s
+    else:
+        # Local style starting with 0 → attach default country code
+        if s.startswith("0"):
+            normalized = default_cc + s.lstrip("0")
+        else:
+            # Assume user typed international digits without the '+'
+            normalized = "+" + s
+
+    if not E164_RE.match(normalized):
+        raise HTTPException(status_code=422, detail="Invalid phone format. Use international like +9647XXXXXXXX.")
+
+    return normalized
+
 
 
 router = APIRouter() 
@@ -21,25 +61,38 @@ def add_admin(aName: str, aPassword: str, user=Depends(get_user_role)):
         return {"message": "Admin added successfully", "admin_id": obj.id}
 
 @router.post("/AddStudent/{name}/{password}")
-def add_student(sname: str, spassword: str, phone_num: str, age: int, class_id: int,
-                user=Depends(get_user_role)):
+def add_student(
+    sname: str,
+    spassword: str,
+    phone_num: str,
+    age: int,
+    class_id: int,
+    user=Depends(get_user_role),
+):
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Only admin can add students")
 
-    hashed = bcrypt.hashpw(spassword.encode('utf-8'), bcrypt.gensalt())
+    phone_e164 = normalize_phone_no_lib(phone_num)  # always returns with leading '+'
+    hashed = bcrypt.hashpw(spassword.encode("utf-8"), bcrypt.gensalt())
+
     with Session(engine) as session:
         cls = session.get(Class, class_id)
         if not cls:
             raise HTTPException(status_code=404, detail="Class not found")
 
-        obj = Student(name=sname, password=hashed, phone_num=phone_num, age=age, class_id=class_id)
+        obj = Student(
+            name=sname,
+            password=hashed,
+            phone_num=phone_e164,
+            age=age,
+            class_id=class_id,
+        )
         session.add(obj)
         session.commit()
         session.refresh(obj)
         return {"message": "Student added successfully", "student_id": obj.id}
-
 @router.post("/AddTeacher/{name}/{password}")
-def add_teacher(name: str, password: str, age: int, salary: float, subject_id: int,
+def add_teacher(sname: str, password: str, age: int, salary: float, subject_id: int,
                 user=Depends(get_user_role)):
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Only admin can add teachers")
@@ -50,31 +103,31 @@ def add_teacher(name: str, password: str, age: int, salary: float, subject_id: i
         if not subject:
             raise HTTPException(status_code=404, detail="Subject not found")
 
-        obj = Teacher(name=name, password=hashed, age=age, salary=salary, subject_id=subject_id)
+        obj = Teacher(name=sname, password=hashed, age=age, salary=salary, subject_id=subject_id)
         session.add(obj)
         session.commit()
         session.refresh(obj)
         return {"message": "Teacher added successfully", "teacher_id": obj.id}
 
 @router.post("/AddClass/{name}/{password}")
-def add_class(name: str, user=Depends(get_user_role)):
+def add_class(sname: str, user=Depends(get_user_role)):
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Only admin can add classes")
 
     with Session(engine) as session:
-        obj = Class(name=name)
+        obj = Class(name=sname)
         session.add(obj)
         session.commit()
         session.refresh(obj)
         return {"message": "Class added successfully", "class_id": obj.id}
 
 @router.post("/AddSubject/{name}/{password}")
-def add_subject(name: str, user=Depends(get_user_role)):
+def add_subject(sname: str, user=Depends(get_user_role)):
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Only admin can add subjects")
 
     with Session(engine) as session:
-        obj = Subject(name=name)
+        obj = Subject(name=sname)
         session.add(obj)
         session.commit()
         session.refresh(obj)
