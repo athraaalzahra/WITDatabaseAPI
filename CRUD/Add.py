@@ -5,43 +5,43 @@ from dbcreate.model import *
 import bcrypt
 from access.dependencies import get_user_role
 import re, unicodedata
-
-
-E164_RE = re.compile(r'^\+[1-9]\d{7,14}$')  # + then 8–15 digits total
+IQ_11_AFTER_964 = re.compile(r'^\+964\d{11}$')
 
 def _to_ascii_digits(s: str) -> str:
-    # Convert any Unicode digit (e.g., Arabic-Indic) to ASCII 0-9
     out = []
     for ch in s:
         try:
-            out.append(str(unicodedata.digit(ch)))
+            out.append(str(unicodedata.digit(ch)))  # handles Arabic/Indic digits too
         except (TypeError, ValueError):
             out.append(ch)
     return ''.join(out)
 
-def normalize_phone_no_lib(raw: str, default_cc: str = "+964") -> str:
+def normalize_phone_iq_11(raw: str) -> str:
     s = _to_ascii_digits(str(raw)).strip()
+    s = re.sub(r"[ \-().]", "", s)  # drop separators
 
-    # Remove common separators/spaces
-    s = re.sub(r"[ \-().]", "", s)
-
-    # Convert leading 00 to +
+    # convert 00 to +
     if s.startswith("00"):
         s = "+" + s[2:]
 
-    if s.startswith("+"):
-        normalized = s
+    if s.startswith("+964"):
+        rest = s[4:]
+        if not rest.isdigit():
+            raise HTTPException(status_code=422, detail="Phone must be +964 followed by digits only.")
+        normalized = "+964" + rest
+    elif s.startswith("964"):
+        rest = s[3:]
+        if not rest.isdigit():
+            raise HTTPException(status_code=422, detail="Phone must be 964 followed by digits only.")
+        normalized = "+964" + rest
     else:
-        # Local style starting with 0 → attach default country code
-        if s.startswith("0"):
-            normalized = default_cc + s.lstrip("0")
-        else:
-            # Assume user typed international digits without the '+'
-            normalized = "+" + s
+        # treat as local; require exactly 11 digits (e.g., 0790xxxxxxx)
+        if not s.isdigit() or len(s) != 11:
+            raise HTTPException(status_code=422, detail="Local phone must be 11 digits (e.g., 0790xxxxxxx).")
+        normalized = "+964" + s  # keep the leading 0 to make 11 after 964
 
-    if not E164_RE.match(normalized):
-        raise HTTPException(status_code=422, detail="Invalid phone format. Use international like +9647XXXXXXXX.")
-
+    if not IQ_11_AFTER_964.match(normalized):
+        raise HTTPException(status_code=422, detail="Phone must be +964 followed by exactly 11 digits.")
     return normalized
 
 
@@ -72,9 +72,9 @@ def add_student(
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Only admin can add students")
 
-    phone_e164 = normalize_phone_no_lib(phone_num)  # always returns with leading '+'
-    hashed = bcrypt.hashpw(spassword.encode("utf-8"), bcrypt.gensalt())
+    phone_fixed = normalize_phone_iq_11(phone_num)  # always "+964" + 11 digits
 
+    hashed = bcrypt.hashpw(spassword.encode("utf-8"), bcrypt.gensalt())
     with Session(engine) as session:
         cls = session.get(Class, class_id)
         if not cls:
@@ -83,7 +83,7 @@ def add_student(
         obj = Student(
             name=sname,
             password=hashed,
-            phone_num=phone_e164,
+            phone_num=phone_fixed,
             age=age,
             class_id=class_id,
         )
