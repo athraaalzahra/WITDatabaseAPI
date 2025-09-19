@@ -1,39 +1,31 @@
-from dbcreate.engcreate import createDB
-from CRUD.Add import *
-from CRUD.Update import *
-from CRUD.Delete import *
-from CRUD.Get import *
-from common.shared import *
-from authorization.isAuthorized import *
-from access.whoAccess import *
+from fastapi import FastAPI
+from pydantic import BaseModel
+from CRUD.Add import router as add_router
+from CRUD.Update import router as update_router
+from CRUD.Delete import router as delete_router
+from CRUD.Get import router as get_router
+from access.dependencies import get_user_role
 
-def main():
-    # createDB()    #We only needed it the first time
-    # AddAdmin()    #I have created one hard-coded admin just at first.
-    while True:
-        print("Login to our database.")
-        name = get_string("Please enter your name: ")
-        password = input("Please enter your password: ")
+app = FastAPI()
 
-        admin = isAdmin(name, password)
-        if admin:
-            adminAccess()
-            continue
+class LoginRequest(BaseModel):
+    name: str
+    password: str
 
-        teacher = isTeacher(name, password)
-        if teacher:
-            teacherAccess()
-            continue
+@app.post("/login")
+def login(request: LoginRequest):
+    result = get_user_role(request.name, request.password)
+    role = result["role"]
+    user = result["user"]
+    
+    response = {"message": f"Welcome {role.capitalize()} {user.name}", "role": role, "id": user.id}
+    if role == "student":
+        response["class_id"] = user.class_id
+    return response
 
-        student = isStudent(name, password)
-        if student:
-            studentAccess(student.id, student.class_id)
-            continue
-
-        print("Invalid name or password!")
+app.include_router(add_router, prefix="/crud", tags=["Add"])
+app.include_router(update_router, prefix="/crud", tags=["Update"])
+app.include_router(delete_router, prefix="/crud", tags=["Delete"])
+app.include_router(get_router, prefix="/crud", tags=["Get"])
 
 
-
-
-if __name__ == "__main__":
-    main()

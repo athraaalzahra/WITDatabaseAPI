@@ -1,101 +1,116 @@
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
-from dbcreate.model import *
 from dbcreate.engcreate import engine
-from common.shared import get_string, get_digits, get_int
+from dbcreate.model import *
+from access.dependencies import get_user_role
 
-    
-def sureDelete():
-    while True:
-            areSure = input("Are you sure you? (Y for Yes, N for No) ").lower().strip()
-            if(areSure == 'y'):
-                return True
-            elif(areSure == 'n'):
-                return False
-            else:
-                print("Please enter a valid option!")
+router = APIRouter()
 
+confirm: bool = Query(default=False)
 
-def deleteAdmin():
+@router.delete("/DeleteAdmin/{name}/{password}")
+def delete_admin(id: int, confirm: bool = False, user=Depends(get_user_role)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can delete admins")
+
     with Session(engine) as session:
-        adminID = get_int("Enter the admin's ID to delete: ")
-        admin = session.get(Admin, adminID)
+        admin = session.get(Admin, id)
         if not admin:
-            print("Admin not found!")
-            return
-        if(sureDelete()):
-            session.delete(admin)
-            session.commit()
-            print("Admin deleted successfully.")
+            raise HTTPException(status_code=404, detail="Admin not found")
+        if not confirm:
+            return {"message": f"Add ?confirm=true to delete {admin.name}"}
+        session.delete(admin)
+        session.commit()
+        return {"message": "Admin deleted successfully"}
 
+@router.delete("/DeleteStudent/{name}/{password}")
+def delete_student(id: int, confirm: bool = False, user=Depends(get_user_role)):
+    if user["role"] not in ["admin", "teacher"]:
+        raise HTTPException(status_code=403, detail="Not authorized to delete students")
 
-def deleteStudent():
     with Session(engine) as session:
-        studentID = get_int("Enter the student's ID to delete: ")
-        student = session.get(Student, studentID)
+        student = session.get(Student, id)
         if not student:
-            print("Student not found!")
-            return
-        if(sureDelete()):
-            session.delete(student)
-            session.commit()
-            print("Student deleted successfully.")
+            raise HTTPException(status_code=404, detail="Student not found")
+        if not confirm:
+            return {"message": f"Add ?confirm=true to delete {student.name}"}
+        session.delete(student)
+        session.commit()
+        return {"message": "Student deleted successfully"}
 
-def deleteTeacher():
+@router.delete("/DeleteTeacher/{name}/{password}")
+def delete_teacher(id: int, confirm: bool = False, user=Depends(get_user_role)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can delete teachers")
+
     with Session(engine) as session:
-        teacherID = get_int("Enter the teacher's ID to delete: ")
-        teacher = session.get(Teacher, teacherID)
+        teacher = session.get(Teacher, id)
         if not teacher:
-            print("Teacher not found!")
-            return
-        if(sureDelete()):
-            session.delete(teacher)
-            session.commit()
-            print("Teacher deleted successfully.")
+            raise HTTPException(status_code=404, detail="Teacher not found")
+        if not confirm:
+            return {"message": f"Add ?confirm=true to delete {teacher.name}"}
+        session.delete(teacher)
+        session.commit()
+        return {"message": "Teacher deleted successfully"}
 
-def deleteClass():
+# ---------------- Class ----------------
+@router.delete("/DeleteClass/{name}/{password}")
+def delete_class(id: int, confirm: bool = False, user=Depends(get_user_role)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can delete classes")
+
     with Session(engine) as session:
-        classID = get_int("Enter the class ID to delete: ")
-        cls = session.get(Class, classID)
+        cls = session.get(Class, id)
         if not cls:
-            print("Class not found!")
-            return
-        if(sureDelete()):
-            session.delete(cls)
-            session.commit()
-            print("Class deleted successfully.")
+            raise HTTPException(status_code=404, detail="Class not found")
+        if not confirm:
+            return {"message": f"Add ?confirm=true to delete {cls.name}"}
+        session.delete(cls)
+        session.commit()
+        return {"message": "Class deleted successfully"}
 
-def deleteSubject():
+# ---------------- Subject ----------------
+@router.delete("/DeleteSubject/{name}/{password}")
+def delete_subject(id: int, confirm: bool = False, user=Depends(get_user_role)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can delete subjects")
+
     with Session(engine) as session:
-        subjectID = get_int("Enter the subject ID to delete: ")
-        subject = session.get(Subject, subjectID)
+        subject = session.get(Subject, id)
         if not subject:
-            print("Subject not found!")
-            return
-        if(sureDelete()):
-            session.delete(subject)
-            session.commit()
-            print("Subject deleted successfully.")
+            raise HTTPException(status_code=404, detail="Subject not found")
+        if not confirm:
+            return {"message": f"Add ?confirm=true to delete {subject.name}"}
+        session.delete(subject)
+        session.commit()
+        return {"message": "Subject deleted successfully"}
 
-def deleteGrade():
+@router.delete("/DeleteGrade/{name}/{password}")
+def delete_grade(id: int, confirm: bool = False, user=Depends(get_user_role)):
+    if user["role"] not in ["admin", "teacher"]:
+        raise HTTPException(status_code=403, detail="Not authorized to delete grades")
+
     with Session(engine) as session:
-        gradeID = get_int("Enter the grade ID to delete: ")
-        grade = session.get(Grade, gradeID)
+        grade = session.get(Grade, id)
         if not grade:
-            print("Grade not found!")
-            return
-        if(sureDelete()):
-            session.delete(grade)
-            session.commit()
-            print("Grade deleted successfully.")
+            raise HTTPException(status_code=404, detail="Grade not found")
+        if not confirm:
+            return {"message": "Add ?confirm=true to delete this grade"}
+        session.delete(grade)
+        session.commit()
+        return {"message": "Grade deleted successfully"}
 
-def deleteClassTeacher():
+@router.delete("/DeleteClassTeacher/{name}/{password}")
+def delete_ct(id: int, confirm: bool = False, user=Depends(get_user_role)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can delete ClassTeacher assignments")
+
     with Session(engine) as session:
-        ctID = get_int("Enter the ClassTeacher ID to delete: ")
-        ct = session.get(ClassTeacher, ctID)
+        ct = session.get(ClassTeacher, id)
         if not ct:
-            print("ClassTeacher record not found!")
-            return
-        if(sureDelete()):
-            session.delete(ct)
-            session.commit()
-            print("ClassTeacher deleted successfully.")
+            raise HTTPException(status_code=404, detail="ClassTeacher not found")
+        if not confirm:
+            return {"message": "Add ?confirm=true to delete this assignment"}
+        session.delete(ct)
+        session.commit()
+        return {"message": "ClassTeacher deleted successfully"}

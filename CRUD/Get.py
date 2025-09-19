@@ -1,123 +1,143 @@
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
-from dbcreate.model import *
-from dbcreate.model import *
 from dbcreate.engcreate import engine
+from dbcreate.model import *
+from access.dependencies import get_user_role
+
+router = APIRouter()
 
 
-def get_admin_by_id(admin_id: int):
+@router.get("/admin/{name}/{password}")
+def get_admin_by_id(admin_id: int, user=Depends(get_user_role)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can view admins")
     with Session(engine) as session:
         admin = session.get(Admin, admin_id)
         if not admin:
-            print("Not found!")
-            return
-        print(f"ID: {admin.id}\nName: {admin.name}")
+            raise HTTPException(status_code=404, detail="Admin not found")
+        return {"id": admin.id, "name": admin.name}
 
 
-def get_all_admins():
+@router.get("/admins/{name}/{password}")
+def get_all_admins(user=Depends(get_user_role)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can view admins")
     with Session(engine) as session:
         admins = session.exec(select(Admin).order_by(Admin.name)).all()
-        if not admins:
-            print("There are no admins found!")
-            return
-        for a in admins:
-            print(f"ID: {a.id}\nName: {a.name}")
+        return [{"id": a.id, "name": a.name} for a in admins]
 
 
-def get_student_by_id(student_id: int):
+@router.get("/student/{name}/{password}")
+def get_student_by_id(student_id: int, user=Depends(get_user_role)):
+    if user["role"] not in ["admin", "teacher", "student"]:
+        raise HTTPException(status_code=403, detail="Not authorized to view students")
+    if user["role"] == "student" and user["id"] != student_id:
+        raise HTTPException(status_code=403, detail="Students can only view their own info")
     with Session(engine) as session:
         student = session.get(Student, student_id)
         if not student:
-            print("Not found!")
-            return
-        print(f"ID: {student.id}")
-        print(f"Name: {student.name}")
-        print(f"Age: {student.age}")
-        print(f"Phone: {student.phone_num}")
-        print(f"ClassID: {student.class_id}")
+            raise HTTPException(status_code=404, detail="Student not found")
+        return {
+            "id": student.id,
+            "name": student.name,
+            "age": student.age,
+            "phone_num": student.phone_num,
+            "class_id": student.class_id,
+        }
 
 
-def get_all_students():
+@router.get("/students/{name}/{password}")
+def get_all_students(user=Depends(get_user_role)):
+    if user["role"] not in ["admin", "teacher"]:
+        raise HTTPException(status_code=403, detail="Not authorized to view all students")
     with Session(engine) as session:
         students = session.exec(select(Student).order_by(Student.name)).all()
-        if not students:
-            print("There are no students found!")
-            return
-        for s in students:
-            print(f"ID: {s.id}, Name: {s.name}, Age: {s.age}, Phone: {s.phone_num}, ClassID: {s.class_id}")
+        return [
+            {"id": s.id, "name": s.name, "age": s.age, "phone_num": s.phone_num, "class_id": s.class_id}
+            for s in students
+        ]
 
 
-def get_teacher_by_id(teacher_id: int):
+@router.get("/teacher/{name}/{password}")
+def get_teacher_by_id(teacher_id: int, user=Depends(get_user_role)):
+    if user["role"] not in ["admin", "teacher"]:
+        raise HTTPException(status_code=403, detail="Not authorized to view teachers")
     with Session(engine) as session:
         teacher = session.get(Teacher, teacher_id)
         if not teacher:
-            print("Not found!")
-            return
-        print(f"ID: {teacher.id}")
-        print(f"Name: {teacher.name}")
-        print(f"Age: {teacher.age}")
-        print(f"Salary: {teacher.salary}")
-        print(f"SubjectID: {teacher.subject_id}")
+            raise HTTPException(status_code=404, detail="Teacher not found")
+        return {
+            "id": teacher.id,
+            "name": teacher.name,
+            "age": teacher.age,
+            "salary": teacher.salary,
+            "subject_id": teacher.subject_id,
+        }
 
 
-def get_all_teachers():
+@router.get("/teachers/{name}/{password}")
+def get_all_teachers(user=Depends(get_user_role)):
+    if user["role"] not in ["admin", "teacher"]:
+        raise HTTPException(status_code=403, detail="Not authorized to view teachers")
     with Session(engine) as session:
         teachers = session.exec(select(Teacher).order_by(Teacher.name)).all()
-        if not teachers:
-            print("There are no teachers found!")
-            return
-        for t in teachers:
-            print(f"ID: {t.id}, Name: {t.name}, Age: {t.age}, Salary: {t.salary}, SubjectID: {t.subject_id}")
+        return [
+            {"id": t.id, "name": t.name, "age": t.age, "salary": t.salary, "subject_id": t.subject_id}
+            for t in teachers
+        ]
 
 
-def get_class_by_id(class_id: int):
+@router.get("/class/{name}/{password}")
+def get_class_by_id(class_id: int, user=Depends(get_user_role)):
     with Session(engine) as session:
         cls = session.get(Class, class_id)
         if not cls:
-            print("Not found!")
-            return
-        print(cls)
+            raise HTTPException(status_code=404, detail="Class not found")
+        return cls
 
-def get_class_by_studentID(student_id: int):
+
+@router.get("/class/student/{name}/{password}")
+def get_class_by_studentID(student_id: int, user=Depends(get_user_role)):
+    if user["role"] == "student" and user["id"] != student_id:
+        raise HTTPException(status_code=403, detail="Cannot view other students' classes")
     with Session(engine) as session:
         student = session.get(Student, student_id)
         if not student:
-            print("student not found!")
-            return
+            raise HTTPException(status_code=404, detail="Student not found")
         cls = session.get(Class, student.class_id)
         if not cls:
-            print("Class not found!")
-        print(cls)
+            raise HTTPException(status_code=404, detail="Class not found")
+        return cls
 
-def get_all_classes():
+
+@router.get("/classes/{name}/{password}")
+def get_all_classes(user=Depends(get_user_role)):
     with Session(engine) as session:
         classes = session.exec(select(Class).order_by(Class.name)).all()
-        if not classes:
-            print("There are no classes found!")
-            return
-        for c in classes:
-            print(c)
+        return classes
 
 
-def get_subject_by_id(subject_id: int):
+@router.get("/subject/{name}/{password}")
+def get_subject_by_id(subject_id: int, user=Depends(get_user_role)):
     with Session(engine) as session:
         subject = session.get(Subject, subject_id)
         if not subject:
-            print("Subject not found!")
-            return
-        print(subject)
+            raise HTTPException(status_code=404, detail="Subject not found")
+        return subject
 
 
-def get_all_subjects():
+@router.get("/subjects/{name}/{password}")
+def get_all_subjects(user=Depends(get_user_role)):
     with Session(engine) as session:
         subjects = session.exec(select(Subject).order_by(Subject.name)).all()
-        if not subjects:
-            print("There are no subjects found!")
-            return
-        for sub in subjects:
-            print(sub)
+        return subjects
 
 
-def get_grades_by_student(student_id: int):
+@router.get("/grades/student/{name}/{password}")
+def get_grades_by_student(student_id: int, user=Depends(get_user_role)):
+    if user["role"] == "student" and user["id"] != student_id:
+        raise HTTPException(status_code=403, detail="Cannot view other students' grades")
+
     with Session(engine) as session:
         results = session.exec(
             select(Subject, Grade)
@@ -125,15 +145,11 @@ def get_grades_by_student(student_id: int):
             .where(Grade.student_id == student_id)
             .order_by(Subject.name)
         ).all()
-        grades_list = [
-            {"subject": g[0].name, "grade": g[1].grade} for g in results
-        ]
-        student = session.get(Student, student_id)
-        print(f"The grades that {student.name} has are:")
-        for i in grades_list:
-            print(f"{i['subject']}: {i['grade']}")
+        return [{"subject": g[0].name, "grade": g[1].grade} for g in results]
 
-def get_teachers_by_class(class_id: int):
+
+@router.get("/teachers/class/{name}/{password}")
+def get_teachers_by_class(class_id: int, user=Depends(get_user_role)):
     with Session(engine) as session:
         results = session.exec(
             select(Class.name, Teacher.name)
@@ -142,6 +158,4 @@ def get_teachers_by_class(class_id: int):
             .where(Class.id == class_id)
             .order_by(Teacher.name)
         ).all()
-        print(results)
-        for class_name, teacher_name in results:
-            print(f"{class_name}: {teacher_name}")
+        return [{"class_name": c, "teacher_name": t} for c, t in results]
